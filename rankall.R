@@ -8,6 +8,7 @@ rankall<-function(outcome, num = "best")
   outcome_file <- read.csv("outcome-of-care-measures.csv")
   if(outcome %in% names(outcome_file))
   {
+    outcome_file[,outcome] <- as.numeric(outcome_file[,outcome])
     require(dplyr)
     if(num == "best")
     {
@@ -29,7 +30,7 @@ rankall<-function(outcome, num = "best")
     require(sqldf)
     outcome <- sprintf('[%s]', outcome)
     #outcome_file
-    sql<-sprintf('select State, [Hospital.Name] from outcome_file where InnerRank = %d and %s != "Not Available"',rank,outcome)
+    sql<-sprintf('select State, [Hospital.Name], %s from outcome_file where InnerRank = %d and %s != "Not Available"',outcome, rank,outcome)
     sqldf(sql)
   }
   else

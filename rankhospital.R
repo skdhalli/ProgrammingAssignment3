@@ -4,6 +4,7 @@ rankhospital<-function(state, outcome, num = "best")
   outcome_file <- read.csv("outcome-of-care-measures.csv")
   if(outcome %in% names(outcome_file))
   {
+    outcome_file[,outcome] <- as.numeric(outcome_file[,outcome])
     require(sqldf)
     outcome <- sprintf('[%s]', outcome)
     if(num == "best")
@@ -19,17 +20,17 @@ rankhospital<-function(state, outcome, num = "best")
       limit <- num
     }
     
-    sql<-sprintf('select [Hospital.Name] from outcome_file where State = "%s" and %s != "Not Available" order by cast(%s as numeric), [Hospital.Name] asc limit %s', state,outcome, outcome, limit)
+    sql<-sprintf('select State, [Hospital.Name], %s from outcome_file where State = "%s" and %s != "Not Available" order by cast(%s as numeric), [Hospital.Name] asc limit %s', outcome, state,outcome, outcome, limit)
     res<-sqldf(sql)
     if(nrow(res) > 0)
     {
       if(limit == nrow(res))
       {
-        res[limit,1]
+        res[limit,]
       }
       else if(limit == -1)
       {
-        res[nrow(res),1]
+        res[nrow(res),]
       }
       else if(limit == nrow(res))
       {
